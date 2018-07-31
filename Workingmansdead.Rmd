@@ -1,0 +1,55 @@
+---
+title: "Workingman's Dead"
+output: html_notebook
+---
+
+
+
+```{r}
+# R package for pulling in song lyrics
+library(geniusR) 
+# collection of tidy data analysis pacakages
+library(tidyverse)
+# Tidy text manipulations
+library(tidytext)
+
+# Scape the lyrics for my favorite Grateful Dead Album "Workingman's Dead"
+Dead <- genius_album(artist = "Grateful Dead", album = "Workingman's Dead")
+```
+
+```{r}
+# anti_join to remove stop words
+tidy_Dead <- Dead %>%
+  unnest_tokens(word,lyric) %>%
+  anti_join(stop_words)
+```
+
+```{r}
+song_words <- tidy_Dead %>%
+  count(track_title, word, sort = TRUE) %>%
+  ungroup()
+```
+
+```{r}
+song_words <- song_words %>%
+  bind_tf_idf(word, track_title, n) %>%
+  arrange(desc(tf_idf))
+
+head(song_words)
+```
+
+```{r}
+df = song_words %>%
+  mutate(word = factor(word, levels = rev(unique(word)))) %>%
+  group_by(track_title) %>%
+  top_n(5) %>%
+  ungroup() 
+
+
+
+ df %>%  ggplot(aes(word, tf_idf, fill = track_title)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "tf-idf") +
+  facet_wrap(~track_title, ncol = 2, scales = "free") 
+```
+
