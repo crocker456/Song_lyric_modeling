@@ -52,6 +52,6 @@ df = song_words %>%
   labs(x = NULL, y = "tf-idf") +
   facet_wrap(~track_title, ncol = 2, scales = "free") +
   theme_fivethirtyeight()
- ggsave("gucci.png", plot1)
+ ggsave("gucci.png", plot1, height = 14, width = 14)
 ```
 
